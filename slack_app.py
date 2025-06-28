@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
-from slack_bolt.adapter.fastapi import SlackRequestHandler
 from slack_bolt.async_app import AsyncApp
+from slack_bolt.adapter.fastapi.async_handler import AsyncSlackRequestHandler
 from slack_sdk.web.async_client import AsyncWebClient
 from dotenv import load_dotenv
 from pyngrok import ngrok 
@@ -11,17 +11,18 @@ load_dotenv()  # .env 読み込み
 
 # ------------ ngrok 起動 -------------
 ngrok.set_auth_token(os.getenv("NGROK_AUTH_TOKEN"))
-public_url = ngrok.connect(8000, bind_tls=True)   # http://→https://
-print(f" 🌐  Public URL: {public_url}")
+tunnel = ngrok.connect(8000, bind_tls=True)            # ★
+public_url = tunnel.public_url                         # ★
+print(f"🌐  Slack Request URL → {public_url}/slack/events")  # ★
+atexit.register(lambda: ngrok.disconnect(tunnel.public_url))
 
-atexit.register(lambda: ngrok.disconnect(public_url))
 
 # --- Bolt 初期化 -----------------------------------------------------------
 bolt_app = AsyncApp(
     token=os.environ["SLACK_BOT_TOKEN"],
     signing_secret=os.environ["SLACK_SIGNING_SECRET"],
 )
-handler = SlackRequestHandler(bolt_app)
+handler = AsyncSlackRequestHandler(bolt_app)
 
 # --- あなたの既存パイプライン ---------------------------------------------
 from demo import read_document, sanitize_text, bullets_to_sentences, extract_claims, verify_claims
@@ -36,7 +37,8 @@ async def on_file_shared(body, client: AsyncWebClient, logger):
     filename = info["file"]["name"]
 
     headers = {"Authorization": f"Bearer {os.environ['SLACK_BOT_TOKEN']}"}
-    async with aiohttp.ClientSession() as sess, sess.get(url, headers=headers) as resp:
+    async with aiohttp.ClientSession() as sess:
+      async with sess.get(url, headers=headers) as resp:
         data = await resp.read()
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(filename)[1])
     tmp.write(data); tmp.close()
@@ -46,7 +48,7 @@ async def on_file_shared(body, client: AsyncWebClient, logger):
         await client.chat_postMessage(channel=body["event"]["channel_id"], text=f"❌ {err}")
         return
 
-    bullets    = sanitize_text(text).split("\n")
+    bullets    = [line.strip() for line in text.splitlines() if line.strip()]
     sentences  = await bullets_to_sentences(bullets)
     claims     = await extract_claims("\n".join(sentences))
     results    = await verify_claims(claims)
@@ -55,7 +57,11 @@ async def on_file_shared(body, client: AsyncWebClient, logger):
     if not refuted:
         msg = "✅ 誤りのある主張は見つかりませんでした！"
     else:
-        msg = "*REFUTED claims:*\n" + "\n".join(f"• {r['claim']}" for r in refuted)
+        bullets = []
+        for r in refuted:
+            reason = r["verdict"].split(":", 1)[-1].strip()
+            bullets.append(f"• {r['claim']}  →  {reason}")
+        msg = "*誤りが見つかりました:*\n" + "\n".join(bullets)
     await client.chat_postMessage(channel=body["event"]["channel_id"], text=msg)
 
 # --- FastAPI エンドポイント -----------------------------------------------
@@ -63,4 +69,18 @@ app = FastAPI()
 @app.post("/slack/events")
 async def slack_events(request: Request):
     return await handler.handle(request)
+
+
+if __name__ == "__main__":
+    import uvicorn, nest_asyncio, threading, time
+    nest_asyncio.apply()
+
+    def _run():
+        uvicorn.run("slack_app:app", host="0.0.0.0", port=8000,
+                    log_level="info", access_log=False)
+
+    threading.Thread(target=_run, daemon=True).start()
+    while True:
+        time.sleep(3600)
+
 
