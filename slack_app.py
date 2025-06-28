@@ -24,7 +24,7 @@ bolt_app = AsyncApp(
 handler = SlackRequestHandler(bolt_app)
 
 # --- あなたの既存パイプライン ---------------------------------------------
-from demo3 import read_document, sanitize_text, bullets_to_sentences, extract_claims, verify_claims
+from demo import read_document, sanitize_text, bullets_to_sentences, extract_claims, verify_claims
 # ↑ 上で貼り付けたコードを `factcheck_core.py` 等にそのまま分離しておくとスマート
 
 # --- ファイル共有イベント --------------------------------------------------
