@@ -17,7 +17,6 @@ class _FakeCompletion:
             self.choices=[types.SimpleNamespace(message=types.SimpleNamespace(function_call=func_call))]
 
 class _FakeChat:
-    async def create(self, **kwargs): return _FakeCompletion('{"sentences": ["テスト主張"]}')
     async def create(self, **kwargs):
         # function-call 時は JSON を返し、通常チャットは文字列を返す
         if kwargs.get("function_call"):
