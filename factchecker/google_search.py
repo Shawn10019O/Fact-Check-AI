@@ -1,6 +1,6 @@
 import asyncio
 from typing import List, Dict
-from googleapiclient.discovery import build
+from googleapiclient.discovery import build # type: ignore
 from tenacity import (
     retry,
     stop_after_attempt,
