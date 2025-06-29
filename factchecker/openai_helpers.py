@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict,cast
 from tenacity import (
     retry,
     stop_after_attempt,
@@ -15,13 +15,13 @@ client = AsyncOpenAI()
     wait=wait_exponential_jitter(initial=1, max=10),
     retry=retry_if_exception_type(OpenAIError),
 )
-async def openai_chat(messages: List[Dict], *, model: str = "gpt-4o-mini") -> str:
+async def openai_chat(messages: List[Dict], *, model: str = "gpt-4o-mini") -> str: # type: ignore[arg-type]
     rsp = await client.chat.completions.create(
         model=model,
         messages=messages,
         temperature=0.0,
     )
-    return rsp.choices[0].message.content.strip()
+    return cast(str, rsp.choices[0].message.content).strip()
 
 
 BULLET_SYS = {
