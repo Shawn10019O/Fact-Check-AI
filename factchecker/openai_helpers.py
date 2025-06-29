@@ -18,9 +18,9 @@ client = AsyncOpenAI()
 async def openai_chat(messages: List[Dict], *, model: str = "gpt-4o-mini") -> str:
     rsp = await client.chat.completions.create( 
         model=model,
-        messages=messages,
+        messages=messages,# type: ignore[arg-type]
         temperature=0.0,
-    ) # type: ignore[arg-type]
+    )
     content = rsp.choices[0].message.content or ""
     return content.strip()
 
