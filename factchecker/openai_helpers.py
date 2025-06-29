@@ -16,7 +16,7 @@ client = AsyncOpenAI()
     retry=retry_if_exception_type(OpenAIError),
 )
 async def openai_chat(messages: List[Dict], *, model: str = "gpt-4o-mini") -> str:
-    rsp = await client.chat.completions.create( # type: ignore[arg-type]
+    rsp = await client.chat.completions.create( # type: ignore[arg-type,call-overload]
         model=model,
         messages=messages,
         temperature=0.0,
@@ -51,7 +51,7 @@ BULLET_FUNC_SPEC = {
 async def bullets_to_sentences(bullets: list[str]) -> list[str]:
     """`bullets` = 箇条書き1行ごとのリスト"""
     prompt = "\n".join(bullets)
-    rsp = await client.chat.completions.create( # type: ignore[arg-type]
+    rsp = await client.chat.completions.create( # type: ignore[arg-type,call-overload]
         model="gpt-4o-mini",
         messages=[BULLET_SYS, {"role": "user", "content": prompt}],
         functions=[BULLET_FUNC_SPEC],
