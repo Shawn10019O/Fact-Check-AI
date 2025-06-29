@@ -11,24 +11,23 @@ from factchecker.openai_helpers   import bullets_to_sentences
 from factchecker.extractor        import extract_claims
 from factchecker.verifier         import verify_claims
 
-load_dotenv()  # .env 読み込み
+load_dotenv()
 
-# ------------ ngrok 起動 -------------
+# ngrok起動
 ngrok.set_auth_token(os.getenv("NGROK_AUTH_TOKEN"))
-tunnel = ngrok.connect(8000, bind_tls=True)            # ★
-public_url = tunnel.public_url                         # ★
-print(f"🌐  Slack Request URL → {public_url}/slack/events")  # ★
+tunnel = ngrok.connect(8000, bind_tls=True)           
+public_url = tunnel.public_url                        
+print(f"🌐  Slack Request URL → {public_url}/slack/events") 
 atexit.register(lambda: ngrok.disconnect(tunnel.public_url))
 
 
-# --- Bolt 初期化 -----------------------------------------------------------
 bolt_app = AsyncApp(
     token=os.environ["SLACK_BOT_TOKEN"],
     signing_secret=os.environ["SLACK_SIGNING_SECRET"],
 )
 handler = AsyncSlackRequestHandler(bolt_app)
 
-# --- ファイル共有イベント --------------------------------------------------
+# --- ファイル共有イベント
 @bolt_app.event("file_shared")
 async def on_file_shared(body, client: AsyncWebClient, logger):
     file_id  = body["event"]["file_id"]
@@ -50,7 +49,6 @@ async def on_file_shared(body, client: AsyncWebClient, logger):
 
     clean_text  = sanitize_text(text)
     bullets     = clean_text.split("\n")
-    # 空行や空文字を除去
     bullets     = [line for line in bullets if line]
     sentences  = await bullets_to_sentences(bullets)
     claims     = await extract_claims("\n".join(sentences))
@@ -67,8 +65,8 @@ async def on_file_shared(body, client: AsyncWebClient, logger):
         msg = "*誤りが見つかりました:*\n" + "\n".join(bullets)
     await client.chat_postMessage(channel=body["event"]["channel_id"], text=msg)
 
-# --- FastAPI エンドポイント -----------------------------------------------
 app = FastAPI()
+# Slack Events APIからのリクエストを受け付けるエンドポイント
 @app.post("/slack/events")
 async def slack_events(request: Request):
     return await handler.handle(request)

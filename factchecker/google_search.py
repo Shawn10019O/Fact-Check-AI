@@ -20,8 +20,6 @@ MAX_SOURCES = 5
     retry=retry_if_exception_type(Exception),
 )
 async def google_search(claim: str) -> List[Dict]:
-    """Thread‑off blocking googleapiclient call to keep async loop free."""
-
     def _sync_search() -> List[Dict]:
         service = build("customsearch", "v1", developerKey=GOOGLE_API_KEY)
         res = (

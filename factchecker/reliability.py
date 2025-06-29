@@ -1,7 +1,7 @@
 from typing import Tuple
 
+#ドメインごとに信頼度ラベルとスコアを返す
 def get_source_reliability(url: str) -> Tuple[str, int]:
-    """ドメインごとに信頼度ラベルとスコアを返す"""
     url = url.lower()
     high = [
         ".sciencemag.org",
