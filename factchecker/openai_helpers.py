@@ -16,11 +16,11 @@ client = AsyncOpenAI()
     retry=retry_if_exception_type(OpenAIError),
 )
 async def openai_chat(messages: List[Dict], *, model: str = "gpt-4o-mini") -> str:
-    rsp = await client.chat.completions.create( # type: ignore
+    rsp = await client.chat.completions.create( 
         model=model,
         messages=messages,
         temperature=0.0,
-    )
+    ) # type: ignore[arg-type]
     content = rsp.choices[0].message.content or ""
     return content.strip()
 
