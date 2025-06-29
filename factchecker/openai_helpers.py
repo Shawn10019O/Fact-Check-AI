@@ -21,7 +21,8 @@ async def openai_chat(messages: List[Dict], *, model: str = "gpt-4o-mini") -> st
         messages=messages,
         temperature=0.0,
     )
-    return rsp.choices[0].message.content.strip()
+    content = rsp.choices[0].message.content or ""
+    return content.strip()
 
 
 BULLET_SYS = {
