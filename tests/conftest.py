@@ -1,7 +1,9 @@
 import pytest
 import types
 import asyncio
+import os 
 
+os.environ.setdefault("OPENAI_API_KEY", "test-key")
 # OpenAI モック
 class _FakeChoice:
     def __init__(self, content): self.message = types.SimpleNamespace(content=content, function_call=types.SimpleNamespace(arguments='{"claims": ["テスト主張"]}'))
