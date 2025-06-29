@@ -1,8 +1,9 @@
 import os
 import re
+import json
 import asyncio
 from typing import List, Dict, Tuple
-import argparse, textwrap
+import argparse
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from tenacity import (
@@ -17,7 +18,6 @@ import PyPDF2
 # --- third‑party async client (openai>=1.14.0) ---
 from openai import AsyncOpenAI, OpenAIError
 import sys
-from pptx.enum.text import PP_PARAGRAPH_ALIGNMENT
 
 
 load_dotenv()

@@ -1,4 +1,4 @@
-import pytest, asyncio
+import pytest
 from factchecker.google_search import google_search
 
 @pytest.mark.asyncio

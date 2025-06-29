@@ -1,4 +1,4 @@
-import pytest, asyncio
+import pytest
 from factchecker.verifier import verify_claims
 
 @pytest.mark.asyncio

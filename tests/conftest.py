@@ -1,6 +1,8 @@
-import pytest, types, asyncio
+import pytest
+import types
+import asyncio
 
-# ---------- OpenAI モック ----------
+# OpenAI モック
 class _FakeChoice:
     def __init__(self, content): self.message = types.SimpleNamespace(content=content, function_call=types.SimpleNamespace(arguments='{"claims": ["テスト主張"]}'))
 
@@ -18,7 +20,7 @@ def patch_openai(monkeypatch):
     monkeypatch.setattr("factchecker.extractor.client", fake_client)
     yield
 
-# ---------- Google Custom Search モック ----------
+# Google Custom Search モック
 @pytest.fixture(autouse=True)
 def patch_google(monkeypatch):
     async def _fake_search(claim):  # 常に同じ5件を返すダミー
@@ -26,7 +28,7 @@ def patch_google(monkeypatch):
     monkeypatch.setattr("factchecker.google_search.google_search", _fake_search)
     yield
 
-# ---------- 非同期テストのイベントループ -----------
+# 非同期テストのイベントループ
 @pytest.fixture(scope="session")
 def event_loop():
     loop = asyncio.new_event_loop()

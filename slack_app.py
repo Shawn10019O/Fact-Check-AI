@@ -4,9 +4,11 @@ from slack_bolt.adapter.fastapi.async_handler import AsyncSlackRequestHandler
 from slack_sdk.web.async_client import AsyncWebClient
 from dotenv import load_dotenv
 from pyngrok import ngrok 
-import os, tempfile, aiohttp, asyncio
+import os
+import tempfile
+import aiohttp
 import atexit
-from factchecker.doc_reader import read_document, sanitize_text,extract_lines
+from factchecker.doc_reader import read_document, sanitize_text
 from factchecker.openai_helpers   import bullets_to_sentences
 from factchecker.extractor        import extract_claims
 from factchecker.verifier         import verify_claims
