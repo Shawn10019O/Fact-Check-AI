@@ -9,12 +9,21 @@ class _FakeChoice:
     def __init__(self, content): self.message = types.SimpleNamespace(content=content, function_call=types.SimpleNamespace(arguments='{"claims": ["テスト主張"]}'))
 
 class _FakeCompletion:
-    def __init__(self, arguments_json: str):
-        func_call = types.SimpleNamespace(arguments=arguments_json)
-        self.choices=[types.SimpleNamespace(message=types.SimpleNamespace(function_call=func_call))]
+    def __init__(self, *, json_payload: str | None = None):
+        if json_payload is None:          # openai_chat 用
+            self.choices=[types.SimpleNamespace(message=types.SimpleNamespace(content="SUPPORTED: 根拠十分"))]
+        else:                             # bullets_to_sentences 用
+            func_call = types.SimpleNamespace(arguments=json_payload)
+            self.choices=[types.SimpleNamespace(message=types.SimpleNamespace(function_call=func_call))]
 
 class _FakeChat:
-    async def create(self, **kwargs): return _FakeCompletion("SUPPORTED: 根拠十分")
+    async def create(self, **kwargs): return _FakeCompletion('{"sentences": ["テスト主張"]}')
+    async def create(self, **kwargs):
+        # function-call 時は JSON を返し、通常チャットは文字列を返す
+        if kwargs.get("function_call"):
+            return _FakeCompletion(json_payload='{"sentences": ["テスト主張"]}')
+        return _FakeCompletion()
+
 
 @pytest.fixture(autouse=True)
 def patch_openai(monkeypatch):
