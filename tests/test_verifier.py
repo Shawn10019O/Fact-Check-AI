@@ -1,5 +1,5 @@
 import pytest
-from factchecker.verifier import vf
+import factchecker.verifier as vf
 @pytest.mark.asyncio
 async def test_verify_claims():
     results = await vf(["ダミー主張"])
