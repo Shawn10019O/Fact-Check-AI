@@ -1,4 +1,4 @@
-from typing import List, Dict,cast
+from typing import List, Dict
 from tenacity import (
     retry,
     stop_after_attempt,
@@ -15,13 +15,13 @@ client = AsyncOpenAI()
     wait=wait_exponential_jitter(initial=1, max=10),
     retry=retry_if_exception_type(OpenAIError),
 )
-async def openai_chat(messages: List[Dict], *, model: str = "gpt-4o-mini") -> str: # type: ignore[arg-type]
-    rsp = await client.chat.completions.create(
+async def openai_chat(messages: List[Dict], *, model: str = "gpt-4o-mini") -> str:
+    rsp = await client.chat.completions.create( # type: ignore[arg-type]
         model=model,
         messages=messages,
         temperature=0.0,
     )
-    return cast(str, rsp.choices[0].message.content).strip()
+    return rsp.choices[0].message.content.strip()
 
 
 BULLET_SYS = {
@@ -51,7 +51,7 @@ BULLET_FUNC_SPEC = {
 async def bullets_to_sentences(bullets: list[str]) -> list[str]:
     """`bullets` = 箇条書き1行ごとのリスト"""
     prompt = "\n".join(bullets)
-    rsp = await client.chat.completions.create(
+    rsp = await client.chat.completions.create( # type: ignore[arg-type]
         model="gpt-4o-mini",
         messages=[BULLET_SYS, {"role": "user", "content": prompt}],
         functions=[BULLET_FUNC_SPEC],

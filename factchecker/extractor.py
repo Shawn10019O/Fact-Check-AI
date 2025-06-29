@@ -32,9 +32,9 @@ EXTRACT_FUNC_SPEC = {
 }
 
 
-async def extract_claims(text: str) -> List[str]: # type: ignore[arg-type,call-arg]
+async def extract_claims(text: str) -> List[str]:
     messages = [EXTRACT_SYS_MSG, {"role": "user", "content": text}]
-    rsp = await client.chat.completions.create(
+    rsp = await client.chat.completions.create( # type: ignore[arg-type,call-arg]
         model="gpt-4o-mini",
         messages=messages,
         functions=[EXTRACT_FUNC_SPEC],
