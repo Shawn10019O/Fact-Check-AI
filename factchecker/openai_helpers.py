@@ -5,7 +5,7 @@ from tenacity import (
     wait_exponential_jitter,
     retry_if_exception_type,
 )
-
+import json
 from openai import AsyncOpenAI, OpenAIError
 
 client = AsyncOpenAI()
@@ -24,7 +24,6 @@ async def openai_chat(messages: List[Dict], *, model: str = "gpt-4o-mini") -> st
     return rsp.choices[0].message.content.strip()
 
 
-import json
 BULLET_SYS = {
     "role": "system",
     "content": (
