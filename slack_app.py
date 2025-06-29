@@ -6,6 +6,10 @@ from dotenv import load_dotenv
 from pyngrok import ngrok 
 import os, tempfile, aiohttp, asyncio
 import atexit
+from factchecker.doc_reader       import read_document, sanitize_text
+from factchecker.openai_helpers   import bullets_to_sentences
+from factchecker.extractor        import extract_claims
+from factchecker.verifier         import verify_claims
 
 load_dotenv()  # .env 読み込み
 
@@ -23,10 +27,6 @@ bolt_app = AsyncApp(
     signing_secret=os.environ["SLACK_SIGNING_SECRET"],
 )
 handler = AsyncSlackRequestHandler(bolt_app)
-
-# --- あなたの既存パイプライン ---------------------------------------------
-from demo import read_document, sanitize_text, bullets_to_sentences, extract_claims, verify_claims
-# ↑ 上で貼り付けたコードを `factcheck_core.py` 等にそのまま分離しておくとスマート
 
 # --- ファイル共有イベント --------------------------------------------------
 @bolt_app.event("file_shared")

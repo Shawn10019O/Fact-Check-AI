@@ -10,3 +10,4 @@ uvicorn
 slack-bolt[asyncio]
 aiohttp
 pyngrok
+pptx
