@@ -8,7 +8,7 @@ from tenacity import (
     retry_if_exception_type,
 )
 import os
-from reliability import get_source_reliability
+from factchecker.reliability import get_source_reliability
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 CUSTOM_SEARCH_ENGINE_ID = os.getenv("CUSTOM_SEARCH_ENGINE_ID")
