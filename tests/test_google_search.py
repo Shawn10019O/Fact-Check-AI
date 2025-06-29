@@ -1,8 +1,8 @@
 import pytest
-from factchecker.google_search import google_search
+import factchecker.google_search as gs
 
 @pytest.mark.asyncio
 async def test_google_search():
-    res = await google_search("dummy claim")
+    res = await gs("dummy claim")
     assert len(res) == 5
     assert res[0]["reliability"] == "高"

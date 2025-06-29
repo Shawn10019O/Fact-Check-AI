@@ -9,7 +9,9 @@ class _FakeChoice:
     def __init__(self, content): self.message = types.SimpleNamespace(content=content, function_call=types.SimpleNamespace(arguments='{"claims": ["テスト主張"]}'))
 
 class _FakeCompletion:
-    def __init__(self, content): self.choices=[_FakeChoice(content)]
+    def __init__(self, arguments_json: str):
+        func_call = types.SimpleNamespace(arguments=arguments_json)
+        self.choices=[types.SimpleNamespace(message=types.SimpleNamespace(function_call=func_call))]
 
 class _FakeChat:
     async def create(self, **kwargs): return _FakeCompletion("SUPPORTED: 根拠十分")
