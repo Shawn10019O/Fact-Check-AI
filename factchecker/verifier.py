@@ -1,7 +1,7 @@
 import asyncio
 from typing import List, Dict
-from google_search import google_search
-from openai_helpers import openai_chat
+from factchecker.google_search import google_search
+from factchecker.openai_helpers import openai_chat
 
 
 async def evidence_based_verdict(claim: str, sources: List[Dict]) -> str:

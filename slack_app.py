@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from pyngrok import ngrok 
 import os, tempfile, aiohttp, asyncio
 import atexit
-from factchecker.doc_reader       import read_document, sanitize_text
+from factchecker.doc_reader import read_document, sanitize_text,extract_lines
 from factchecker.openai_helpers   import bullets_to_sentences
 from factchecker.extractor        import extract_claims
 from factchecker.verifier         import verify_claims
@@ -48,7 +48,10 @@ async def on_file_shared(body, client: AsyncWebClient, logger):
         await client.chat_postMessage(channel=body["event"]["channel_id"], text=f"❌ {err}")
         return
 
-    bullets    = [line.strip() for line in text.splitlines() if line.strip()]
+    clean_text  = sanitize_text(text)
+    bullets     = clean_text.split("\n")
+    # 空行や空文字を除去
+    bullets     = [line for line in bullets if line]
     sentences  = await bullets_to_sentences(bullets)
     claims     = await extract_claims("\n".join(sentences))
     results    = await verify_claims(claims)
