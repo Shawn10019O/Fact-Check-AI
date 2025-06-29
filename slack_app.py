@@ -8,6 +8,10 @@ import os
 import tempfile
 import aiohttp
 import atexit
+import uvicorn
+import nest_asyncio
+import threading
+import time
 from factchecker.doc_reader import read_document, sanitize_text
 from factchecker.openai_helpers   import bullets_to_sentences
 from factchecker.extractor        import extract_claims
@@ -29,7 +33,7 @@ bolt_app = AsyncApp(
 )
 handler = AsyncSlackRequestHandler(bolt_app)
 
-# --- ファイル共有イベント
+# ファイル共有イベント
 @bolt_app.event("file_shared")
 async def on_file_shared(body, client: AsyncWebClient, logger):
     file_id  = body["event"]["file_id"]
@@ -42,7 +46,8 @@ async def on_file_shared(body, client: AsyncWebClient, logger):
       async with sess.get(url, headers=headers) as resp:
         data = await resp.read()
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(filename)[1])
-    tmp.write(data); tmp.close()
+    tmp.write(data)
+    tmp.close()
 
     text, err = read_document(tmp.name)
     if err:
@@ -75,7 +80,6 @@ async def slack_events(request: Request):
 
 
 if __name__ == "__main__":
-    import uvicorn, nest_asyncio, threading, time
     nest_asyncio.apply()
 
     def _run():

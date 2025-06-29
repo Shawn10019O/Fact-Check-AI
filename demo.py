@@ -173,8 +173,6 @@ async def openai_chat(messages: List[Dict], *, model: str = "gpt-4o-mini") -> st
     )
     return rsp.choices[0].message.content.strip()
 
-
-import json
 BULLET_SYS = {
     "role": "system",
     "content": (
@@ -255,7 +253,6 @@ async def extract_claims(text: str) -> List[str]:
         temperature=0.0,
     )
     payload = rsp.choices[0].message.function_call.arguments
-    import json
 
     claims = json.loads(payload)["claims"]
     return claims

@@ -1,6 +1,7 @@
 from typing import List
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
+import json
 
 load_dotenv()
 
@@ -41,7 +42,6 @@ async def extract_claims(text: str) -> List[str]:
         temperature=0.0,
     )
     payload = rsp.choices[0].message.function_call.arguments
-    import json
 
     claims = json.loads(payload)["claims"]
     return claims
