@@ -16,6 +16,9 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
+      
+      - name: Install project (editable)
+        run: pip install -e .
 
       - name: Ruff (lint)
         run: ruff check .
