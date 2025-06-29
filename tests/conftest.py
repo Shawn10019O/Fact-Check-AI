@@ -38,6 +38,7 @@ def patch_google(monkeypatch):
     async def _fake_search(claim):  # 常に同じ5件を返すダミー
         return [{"title": "dummy", "snippet": "dummy", "link": "https://example.com", "reliability": "高", "score": 3}] * 5
     monkeypatch.setattr("factchecker.google_search.google_search", _fake_search)
+    monkeypatch.setattr("factchecker.verifier.google_search", _fake_search)
     yield
 
 # 非同期テストのイベントループ
